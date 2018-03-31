@@ -47,8 +47,11 @@ install_dependencies() {
 }
 
 build_kaidan() {
+	export PKG_CONFIG_PATH="${CLICK_TARGET_DIR}/usr/lib/pkgconfig"
+
 	mkdir -p $KAIDAN_SOURCES/build
 	cd $KAIDAN_SOURCES/build
+
 	cmake .. \
 	      -GNinja \
 	      -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
