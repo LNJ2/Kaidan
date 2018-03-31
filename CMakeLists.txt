@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 set(CMAKE_CXX_STANDARD 14)
 set(QT_MIN_VERSION "5.8.0")
+set(GLOOX_MIN_VERSION "1.0.19")
 
 project(kaidan)
 
@@ -28,22 +29,19 @@ include(GNUInstallDirs)
 # Dependecies
 #
 
-# CMake module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+find_package(PkgConfig REQUIRED)
 
 # Find packages
 find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Qml Quick Sql QuickControls2)
 find_package(KF5Kirigami2 REQUIRED)
 find_package(Qt5Widgets)
-find_package(Gloox REQUIRED)
+pkg_check_modules(GLOOX REQUIRED gloox>=${GLOOX_MIN_VERSION})
 
-set_package_properties(Qt5Widgets PROPERTIES DESCRIPTION "Integration with QWidget based desktop styles"
-                       TYPE OPTIONAL
-                      )
-if(Qt5Widgets_FOUND)
-  set(HAVE_QWIDGETS 1)
-  add_definitions(-DHAVE_QWIDGETS)
-endif()
+set_package_properties(
+	Qt5Widgets PROPERTIES DESCRIPTION "Integration with QWidget based desktop styles"
+	TYPE OPTIONAL
+)
+
 
 #
 # Load submodules
@@ -83,43 +81,48 @@ add_executable(${PROJECT_NAME}
 	${KAIDANSF_SOURCES} #
 )
 
+#
+# Global C++ variables
+#
+
+if(SAILFISH_OS)
+	add_definitions(-DSAILFISH_OS)
+elseif(UBUNTU_TOUCH)
+	add_definitions(-DUBUNTU_TOUCH)
+else()
+	# on others than sailfish os and ubuntu touch, enable libnotify notifications
+	add_definitions(-DNOTIFICATIONS_LIBNOTIFY)
+endif()
+
+if(Qt5Widgets_FOUND)
+	set(HAVE_QWIDGETS 1)
+	add_definitions(-DHAVE_QWIDGETS)
+endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+	DEBUG_SOURCE_PATH="${CMAKE_SOURCE_DIR}"
+	${KAIDAN_COMPILE_DEFINITIONS}
+)
+
 
 #
-# Linker Flags
+# Compile flags
 #
 
 target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
 	Qt5::Sql
 	Qt5::Qml
-	Qt5::Quick
 	Qt5::Widgets
 	${GLOOX_LIBRARIES}
 )
 
+target_include_directories(${PROJECT_NAME} PUBLIC
+	${GLOOX_INCLUDE_DIRS}
+)
 
-#
-# Global C++ variables
-#
-
-if(SAILFISH_OS)
-	set(KAIDAN_COMPILE_DEFINITIONS
-		SAILFISH_OS=True
-		PLATFORM_DISPLAY_NAME="Sailfish OS"
-	)
-elseif(UBUNTU_TOUCH)
-	set(KAIDAN_COMPILE_DEFINITIONS
-		UBUNTU_TOUCH=True
-	)
-else()
-	set(KAIDAN_COMPILE_DEFINITIONS
-		NOTIFICATIONS_LIBNOTIFY=True
-	)
-endif()
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-	DEBUG_SOURCE_PATH="${CMAKE_SOURCE_DIR}"
-	${KAIDAN_COMPILE_DEFINITIONS}
+target_compile_options(${PROJECT_NAME} PUBLIC
+	${GLOOX_CFLAGS_OTHER}
 )
 
 
