@@ -36,13 +36,13 @@ find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Qml Quick 
 find_package(KF5Kirigami2 REQUIRED)
 find_package(Qt5Widgets)
 pkg_check_modules(GLOOX REQUIRED gloox>=${GLOOX_MIN_VERSION})
-include_directories(${GLOOX_INCLUDE_DIRS})
 
 set_package_properties(
 	Qt5Widgets PROPERTIES DESCRIPTION "Integration with QWidget based desktop styles"
 	TYPE OPTIONAL
 )
 
+include_directories("${CMAKE_PREFIX_PATH}/include")
 
 #
 # Load submodules
