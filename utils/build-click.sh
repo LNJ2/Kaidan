@@ -8,6 +8,8 @@ mkdir -p $CLICK_TARGET_DIR
 ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
 
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$CLICK_TARGET_DIR/lib/$DEB_HOST_MULTIARCH/pkgconfig"
+
 install_deb() {
 	BASE_URL="${1}"; PKG="${2}"; VERSION="${3}"
 	DEB_NAME="${PKG}_${VERSION}_${ARCH}.deb"
@@ -47,9 +49,6 @@ install_dependencies() {
 }
 
 build_kaidan() {
-	find ${CLICK_TARGET_DIR}
-	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:${CLICK_TARGET_DIR}/lib/pkgconfig"
-
 	mkdir -p $KAIDAN_SOURCES/build
 	cd $KAIDAN_SOURCES/build
 
