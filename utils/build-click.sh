@@ -47,7 +47,8 @@ install_dependencies() {
 }
 
 build_kaidan() {
-	export PKG_CONFIG_PATH="${CLICK_TARGET_DIR}/usr/lib/pkgconfig"
+	ls ${CLICK_TARGET_DIR}/usr/lib/pkgconfig
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:${CLICK_TARGET_DIR}/usr/lib/pkgconfig"
 
 	mkdir -p $KAIDAN_SOURCES/build
 	cd $KAIDAN_SOURCES/build
