@@ -117,13 +117,11 @@ target_link_libraries(${PROJECT_NAME}
 	${GLOOX_LIBRARIES}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-	${GLOOX_INCLUDE_DIRS}
-)
-
 target_compile_options(${PROJECT_NAME} PUBLIC
 	${GLOOX_CFLAGS_OTHER}
 )
+
+include_directories(${GLOOX_INCLUDE_DIRS})
 
 
 #
