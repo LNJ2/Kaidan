@@ -1,7 +1,7 @@
 {
   "template": "custom",
   "dir": "./bin/ubuntu-touch/",
-  "build": "../../utils/build-linux-click.sh",
+  "build": "../../utils/clickable-build.sh",
   "kill": "kaidan",
   "specificDependencies": true,
   "dependencies": [

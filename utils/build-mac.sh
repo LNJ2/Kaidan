@@ -7,13 +7,16 @@ if [ -z "$QT_MACOS" ]; then
     exit 1
 fi
 
-# Build type is one of: 
+# Build type is one of:
 # Debug, Release, RelWithDebInfo and MinSizeRel
 BUILD_TYPE="${BUILD_TYPE:-Debug}"
 
 KAIDAN_SOURCES=$(dirname "$(greadlink -f "${0}")")/..
 KIRIGAMI_BUILD=/tmp/kirigami-mac-build
 QXMPP_BUILD=/tmp/qxmpp-mac-build
+
+export LD_LIBRARY_PATH=$QT_MACOS/lib/:$LD_LIBRARY_PATH
+export PATH=$QT_MACOS/bin/:$PATH
 
 echo "-- Starting $BUILD_TYPE build of Kaidan --"
 
@@ -49,11 +52,14 @@ echo "*****************************************"
     cdnew $KAIDAN_SOURCES/3rdparty/qxmpp/build
     cmake .. \
         -DCMAKE_PREFIX_PATH=$QT_MACOS \
-        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF \
         -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$QXMPP_BUILD
     make -j$(sysctl -n hw.logicalcpu)
     make install
     rm -rf $KAIDAN_SOURCES/3rdparty/qxmpp/build
+
+    export LD_LIBRARY_PATH=$QXMPP_BUILD/lib:$LD_LIBRARY_PATH
+    export PKG_CONFIG_PATH=$QXMPP_BUILD/lib/pkgconfig:$PKG_CONFIG_PATH
 }
 fi
 
@@ -68,10 +74,12 @@ echo "*****************************************"
         -DCMAKE_PREFIX_PATH=$QT_MACOS \
         -DECM_ADDITIONAL_FIND_ROOT_PATH=$QT_MACOS \
         -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$KIRIGAMI_BUILD
-    
+
     make -j$(sysctl -n hw.logicalcpu)
     make install
     rm -rf $KAIDAN_SOURCES/3rdparty/kirigami/build
+
+    export LD_LIBRARY_PATH=$KIRIGAMI_BUILD/lib:$LD_LIBRARY_PATH
 }
 fi
 
@@ -79,33 +87,31 @@ if [ ! -f "$KAIDAN_SOURCES/misc/macos/kaidan.icns" ]; then
 echo "*****************************************"
 echo "Rendering logos"
 echo "*****************************************"
-if [ ! $(command -v inkscape)  ] || [ ! $(command -v optipng) ]; then
-echo "Icons can'be generated"
-exit 1
-fi
+# if [ ! $(command -v inkscape)  ] || [ ! $(command -v optipng) ]; then
+# echo "Icons can'be generated"
+# exit 1
+# fi
 
-rendersvg() {
-    inkscape -z -e $2 -w $3 -h $3 -d $4 $1
-    optipng -quiet $2
-}
+# rendersvg() {
+#     inkscape -z -e $2 -w $3 -h $3 -d $4 $1
+#     optipng -quiet -o7 $2
+# }
+#
+# macoslogo() {
+#     rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$1x$1.png" $1 72
+#     rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$(( $1 * 2 ))x$(( $1 * 2 ))@2x.png" $(( $1 * 2 )) 144
+# }
+#
+# mkdir -p $KAIDAN_SOURCES/misc/macos/kaidan.iconset
 
-macoslogo() {
-    rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$1x$1.png" $1 72
-    rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$(( $1 * 2 ))x$(( $1 * 2 ))@2x.png" $(( $1 * 2 )) 144
-}
-
-mkdir -p $KAIDAN_SOURCES/misc/macos/kaidan.iconset
-
-macoslogo 16
-macoslogo 32
-macoslogo 128
-macoslogo 256
-macoslogo 512
+# macoslogo 16
+# macoslogo 32
+# macoslogo 128
+# macoslogo 256
+# macoslogo 512
 
 iconutil --convert icns "$KAIDAN_SOURCES/misc/macos/kaidan.iconset"
 fi
-
-export PKG_CONFIG_PATH=$QXMPP_BUILD/lib/pkgconfig
 
 if [ ! -f "$KAIDAN_SOURCES/build/bin/kaidan" ]; then
 echo "*****************************************"
@@ -129,9 +135,7 @@ echo "Macdeployqt"
 echo "*****************************************"
 {
     cd $KAIDAN_SOURCES/build
-    export LD_LIBRARY_PATH=$QT_MACOS/lib/:$KIRIGAMI_BUILD/lib:$LD_LIBRARY_PATH
-    export PATH=$QT_MACOS/bin/:$PATH
-    
+
     # FIXME: Use `macdeployqt -qmlimport` when QTBUG-70977 is fixed
     if [ ! -d "$QT_MACOS/qml/org/kde/kirigami.2" ]; then
         mkdir -p $QT_MACOS/qml/org/kde

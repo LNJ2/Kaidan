@@ -96,29 +96,29 @@ if [ ! -f "$KAIDAN_SOURCES/misc/macos/kaidan.icns" ]; then
 echo "*****************************************"
 echo "Rendering logos"
 echo "*****************************************"
-if [ ! $(command -v inkscape)  ] || [ ! $(command -v optipng) ]; then
-echo "Icons can'be generated"
-exit 1
-fi
-
-rendersvg()
-{
-    inkscape -z -e $2 -w $3 -h $3 -d $4 $1
-    optipng -quiet $2
-}
-
-macoslogo() {
-    rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$1x$1.png" $1 72
-    rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$(( $1 * 2 ))x$(( $1 * 2 ))@2x.png" $(( $1 * 2 )) 144
-}
-
-mkdir -p $KAIDAN_SOURCES/misc/macos/kaidan.iconset
-
-macoslogo 16
-macoslogo 32
-macoslogo 128
-macoslogo 256
-macoslogo 512
+# if [ ! $(command -v inkscape)  ] || [ ! $(command -v optipng) ]; then
+# echo "Icons can'be generated"
+# exit 1
+# fi
+#
+# rendersvg()
+# {
+#     inkscape -z -e $2 -w $3 -h $3 -d $4 $1
+#     optipng -quiet $2
+# }
+#
+# macoslogo() {
+#     rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$1x$1.png" $1 72
+#     rendersvg $KAIDAN_SOURCES/misc/kaidan-small-margin.svg "$KAIDAN_SOURCES/misc/macos/kaidan.iconset/icon_$(( $1 * 2 ))x$(( $1 * 2 ))@2x.png" $(( $1 * 2 )) 144
+# }
+#
+# mkdir -p $KAIDAN_SOURCES/misc/macos/kaidan.iconset
+#
+# macoslogo 16
+# macoslogo 32
+# macoslogo 128
+# macoslogo 256
+# macoslogo 512
 
 iconutil --convert icns "$KAIDAN_SOURCES/misc/macos/kaidan.iconset"
 fi
@@ -144,6 +144,6 @@ cdnew $KAIDAN_SOURCES/build
         -DIOS_PLATFORM=$IOS_PLATFORM \
         -DIOS_DEPLOYMENT_TARGET="10.0" \
         -DIOS_ARCH="arm64"
-   
+
 }
 fi

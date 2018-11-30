@@ -1,7 +1,8 @@
 linux-appimage:
   image: kaidan/ubuntu-xenial
-  script: utils/build-linux-appimage.sh
+  script: utils/ci-build.sh
   variables:
+    PLATFORM: linux-appimage
     QXMPP_BUILD: /usr
   artifacts:
     paths:
@@ -11,7 +12,7 @@ linux-appimage:
 
 click-xenial:
   image: kaidan/ubuntu-touch-xenial
-  script: utils/travis/build.sh
+  script: utils/ci-build.sh
   variables:
     PLATFORM: ubuntu-touch
   artifacts:
@@ -21,21 +22,20 @@ click-xenial:
 
 ubuntu-trusty:
   image: kaidan/ubuntu-trusty
-  script: utils/travis/build.sh
+  script: utils/ci-build.sh
 
 neon-bionic:
   image: kaidan/neon-bionic
-  script: utils/travis/build.sh
+  script: utils/ci-build.sh
 
 debian-sid:
   image: kaidan/debian-unstable
-  script: utils/travis/build.sh
+  script: utils/ci-build.sh
 
 archlinux:
   image: kaidan/archlinux
-  script: utils/travis/build.sh
+  script: utils/ci-build.sh
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  BUILD_SYSTEM: cmake
   BUILD_TYPE: Release
